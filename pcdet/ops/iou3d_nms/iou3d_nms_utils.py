@@ -8,6 +8,20 @@ import torch
 from ...utils import common_utils
 from . import iou3d_nms_cuda
 
+def boxes_overlap_gpu(boxes_a, boxes_b):
+    """
+    Args:
+        boxes_a: (N, 7) [x, y, z, dx, dy, dz, heading]
+        boxes_b: (N, 7) [x, y, z, dx, dy, dz, heading]
+
+    Returns:
+
+    """
+    assert boxes_a.is_cuda and boxes_b.is_cuda, 'Only support GPU tensors'
+    assert boxes_a.shape[1] == boxes_b.shape[1] == 7
+    ans_overlap = torch.cuda.FloatTensor(torch.Size((boxes_a.shape[0], boxes_b.shape[0]))).zero_()
+    iou3d_nms_cuda.boxes_overlap_bev_gpu(boxes_a.contiguous(), boxes_b.contiguous(), ans_overlap)
+    return ans_overlap
 
 def boxes_bev_iou_cpu(boxes_a, boxes_b):
     """
